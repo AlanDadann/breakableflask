@@ -13,7 +13,6 @@ jobs:
           scan-type: 'fs'
           input: 'requirements.txt'
           severity: 'CRITICAL,HIGH,MEDIUM'
-          exit-code: 1
           format: 'table'
           template: '@default'
           

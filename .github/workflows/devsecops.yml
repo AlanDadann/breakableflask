@@ -1,19 +1,42 @@
 name: Automatisation des tests DevSecOps
+
 on: push
+
 jobs:
   Dependances:
     runs-on: ubuntu-latest
     steps:
-      - name: Dependances
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Scan des dépendances avec Trivy (requirements.txt)
         run: |
-          echo "ecrire ici le scrypt de contrôle des dépendances"
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -v $HOME/.cache/trivy:/root/.cache/ \
+            aquasec/trivy:latest fs \
+              --security-checks vuln \
+              --severity HIGH,CRITICAL \
+              --exit-code 1 \
+              /workspace
+
   Dockerfile:
     runs-on: ubuntu-latest
     needs: Dependances
     steps:
-      - name: Test Dockerfile
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Scan du Dockerfile avec Trivy
         run: |
-          echo "ecrire ici le scrypt de contrôle du Dockerfile"
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -v $HOME/.cache/trivy:/root/.cache/ \
+            aquasec/trivy:latest config \
+              --severity HIGH,CRITICAL \
+              --exit-code 1 \
+              /workspace/Dockerfile
+
   Deploy:
     runs-on: ubuntu-latest
     needs: Dockerfile

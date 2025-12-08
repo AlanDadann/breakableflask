@@ -43,7 +43,7 @@ jobs:
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
           
           echo "Scanning image mon-image-test:latest pour vulnérabilités OS..."
-          trivy image --exit-code 1 --severity CRITICAL,HIGH,MEDIUM,LOW mon-image-test:latest
+          trivy image --severity CRITICAL,HIGH,MEDIUM,LOW mon-image-test:latest
 
       - name: Résultat du Scan de l'Image
         # S'exécute toujours

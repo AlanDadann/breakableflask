@@ -19,13 +19,13 @@ jobs:
           
       - name: Résultat du Contrôle
         if: success()
-        run: echo "✅ Scan des dépendances réussi. Aucune vulnérabilité CRITICAL détectée."
+        run: echo " Scan des dépendances réussi. Aucune vulnérabilité CRITICAL détectée."
 
       - run: |
           
-          if [ ${{ job.status }} == 'success' ]; then echo "✅ Scan des dépendances réussi. Aucune vulnérabilité CRITICAL détectée. Voir les logs pour HIGH/MEDIUM."
+          if [ ${{ job.status }} == 'success' ]; then echo "Scan des dépendances réussi. Aucune vulnérabilité CRITICAL détectée. Voir les logs pour HIGH/MEDIUM."
           else
-            echo "❌ VULNÉRABILITÉS CRITIQUES TROUVÉES ! Le pipeline est bloqué."
+            echo "VULNÉRABILITÉS CRITIQUES TROUVÉES ! Le pipeline est bloqué."
             echo "Veuillez examiner les logs ci-dessus pour le rapport complet des failles."
           fi
 
@@ -33,9 +33,16 @@ jobs:
     runs-on: ubuntu-latest
     needs: Dependances
     steps:
-      - name: Test Dockerfile
-        run: |
-          echo "ecrire ici le scrypt de contrôle du Dockerfile"
+
+      - name: Checkout du Code
+        uses: actions/checkout@v4
+      
+      - name: Linter Hadolint sur Dockerfile
+        uses: reviewdog/action-hadolint@v1
+        with:
+          fail_on_error: true
+
+
   Deploy:
     runs-on: ubuntu-latest
     needs: Dockerfile

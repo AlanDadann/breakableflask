@@ -20,14 +20,11 @@ jobs:
         if: success()
         run: echo " Scan des dépendances réussi. Aucune vulnérabilité CRITICAL détectée."
 
-      - run: |
-          
-          if [ ${{ job.status }} == 'success' ]; then echo "Scan des dépendances réussi. Aucune vulnérabilité CRITICAL détectée. Voir les logs pour HIGH/MEDIUM."
-          else
-            echo "VULNÉRABILITÉS CRITIQUES TROUVÉES ! Le pipeline est bloqué."
-            echo "Veuillez examiner les logs ci-dessus pour le rapport complet des failles."
-          fi
-
+      - name: Résultat du Contrôle
+        # S'exécute toujours
+        run: |
+          echo "✅ Scan des dépendances terminé. Le rapport complet est visible dans les logs de l'étape Trivy."
+  
   Dockerfile:
     runs-on: ubuntu-latest
     needs: Dependances
@@ -48,7 +45,9 @@ jobs:
           echo "Scanning image mon-image-test:latest pour vulnérabilités OS..."
           trivy image --exit-code 1 --severity CRITICAL,HIGH,MEDIUM,LOW mon-image-test:latest
 
-      
+      - name: Résultat du Scan de l'Image
+        # S'exécute toujours
+        run: echo "✅ Scan de l'image terminé. Le rapport complet est visible dans les logs de l'étape Trivy."
 
 
   Deploy:

@@ -1,17 +1,8 @@
-FROM python:3.12-slim
-
+FROM python:3.7
 WORKDIR /app
-
-COPY requirements.txt .
-COPY database-requirements.txt .
-
-RUN pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir -r database-requirements.txt
-
-COPY main.py .
-
-RUN useradd -m appuser
-USER appuser
-
+# Installe tout en root, conserve cache apt/pip
+RUN apt-get update && apt-get install -y gcc libpq-dev
+COPY . /app
+RUN pip install -r requirements.txt
 EXPOSE 4000
 CMD ["python", "main.py"]

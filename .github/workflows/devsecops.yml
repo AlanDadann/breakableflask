@@ -36,11 +36,20 @@ jobs:
 
       - name: Checkout du Code
         uses: actions/checkout@v4
+
+      - name: Construire l'Image
+        run: |
+          echo "Construction de l'image Docker pour analyse..."
+          docker build -t mon-image-test:latest .
+          
+      - name: Scanner l'Image avec Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+          
+          echo "Scanning image mon-image-test:latest pour vulnérabilités OS..."
+          trivy image --exit-code 1 --severity CRITICAL,HIGH,MEDIUM,LOW mon-image-test:latest
+
       
-      - name: Linter Hadolint sur Dockerfile
-        uses: reviewdog/action-hadolint@v1
-        with:
-          fail_on_error: true
 
 
   Deploy:

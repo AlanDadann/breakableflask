@@ -35,7 +35,7 @@ jobs:
             aquasec/trivy:latest config \
               --severity HIGH,CRITICAL \
               --exit-code 1 \
-              /workspace/Dockerfile
+              /workspace
 
   Deploy:
     runs-on: ubuntu-latest

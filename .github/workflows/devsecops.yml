@@ -1,5 +1,6 @@
 name: Automatisation des tests DevSecOps
 on: push
+
 jobs:
   Dependances:
     runs-on: ubuntu-latest
@@ -11,49 +12,43 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
-          input: 'requirements.txt'
           severity: 'CRITICAL,HIGH,MEDIUM'
           format: 'table'
-          template: '@default'
-          
-      - name: Résultat du Contrôle
-        if: success()
-        run: echo " Scan des dépendances réussi. Aucune vulnérabilité CRITICAL détectée."
+          output: 'dependances-report.txt' # On définit le fichier de sortie
 
-      - name: Résultat du Contrôle
-        # S'exécute toujours
-        run: |
-          echo "✅ Scan des dépendances terminé. Le rapport complet est visible dans les logs de l'étape Trivy."
-  
+      - name: Sauvegarder l'artefact Dépendances
+        if: always() # Pour avoir le rapport même si le scan échoue
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-dependances
+          path: dependances-report.txt
+
   Dockerfile:
     runs-on: ubuntu-latest
     needs: Dependances
     steps:
-
       - name: Checkout du Code
         uses: actions/checkout@v4
 
       - name: Construire l'Image
-        run: |
-          echo "Construction de l'image Docker pour analyse..."
-          docker build -t mon-image-test:latest .
+        run: docker build -t mon-image-test:latest .
           
       - name: Scanner l'Image avec Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
-          
-          echo "Scanning image mon-image-test:latest pour vulnérabilités OS..."
-          trivy image --severity CRITICAL,HIGH,MEDIUM,LOW mon-image-test:latest
+          # On ajoute l'option --output
+          trivy image --severity CRITICAL,HIGH,MEDIUM,LOW --format table --output image-report.txt mon-image-test:latest
 
-      - name: Résultat du Scan de l'Image
-        # S'exécute toujours
-        run: echo "✅ Scan de l'image terminé. Le rapport complet est visible dans les logs de l'étape Trivy."
-
+      - name: Sauvegarder l'artefact Image
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-image-docker
+          path: image-report.txt
 
   Deploy:
     runs-on: ubuntu-latest
     needs: Dockerfile
     steps:
       - name: Deploy
-        run: |
-          echo "Rien à faire ici. Votre application est prête à être déployée"
+        run: echo "Déploiement en cours..."

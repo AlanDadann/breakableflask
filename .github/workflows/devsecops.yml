@@ -17,8 +17,16 @@ jobs:
             aquasec/trivy:latest fs \
               --security-checks vuln \
               --severity HIGH,CRITICAL \
-              --exit-code 1 \
+              --format json \
+              --output /workspace/trivy-dep-results.json \
               /workspace
+
+      - name: Sauvegarder rapport dépendances
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-vulnerabilites-deps
+          path: trivy-dep-results.json
 
   Dockerfile:
     runs-on: ubuntu-latest

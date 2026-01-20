@@ -14,10 +14,10 @@ jobs:
           scan-type: 'fs'
           severity: 'CRITICAL,HIGH,MEDIUM'
           format: 'table'
-          output: 'dependances-report.txt' # On définit le fichier de sortie
+          output: 'dependances-report.txt' 
 
       - name: Sauvegarder l'artefact Dépendances
-        if: always() # Pour avoir le rapport même si le scan échoue
+        if: always() 
         uses: actions/upload-artifact@v4
         with:
           name: rapport-dependances
